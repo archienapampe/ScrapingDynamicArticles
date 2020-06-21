@@ -1,11 +1,15 @@
 import json
+
 import scrapy
+from scrapy.loader import ItemLoader
+
+from scraping_project.items import ArticleItem
 
 
 class ArticleSpider(scrapy.Spider):
     name = 'article'
-    start_page = 'https://hbr.org{}'
     api = 'https://hbr.org/service/components/list/the-latest/{}/8?format=json&id=page.list.coronavirus.insight-center'
+    start_page = 'https://hbr.org{}'
     start_urls = [api.format(0)]
     download_delay = 1.5 
     
@@ -13,23 +17,23 @@ class ArticleSpider(scrapy.Spider):
         self.logger.info('start scraping articles')
         data = json.loads(response.text)
         for article in data.get('entry', []):
-            yield {
-                'author': article.get('author', {}),
-                'title': article.get('title'),
-                'category': article.get('category', {}).get('term'),
-                'published': article.get('published'),
-            }
+            loader = ItemLoader(item=ArticleItem(), selector=article)
+            loader.add_value(field_name='title', value=article.get('title'))
+            loader.add_value(field_name='category', value=article.get('category', {}).get('term'))
+            loader.add_value(field_name='published', value=article.get('published'))
+            article_item = loader.load_item()
             
             self.logger.info('get article url')
             article_url = article['link']['href']
-            yield scrapy.Request(url=self.start_page.format(article_url), callback=self.parse_author)
+            yield scrapy.Request(url=self.start_page.format(article_url), callback=self.parse_author, meta={'article_item': article_item})
             
         if data['page']['hasNext']:
             next_page = data['page']['number'] + 1
             yield scrapy.Request(url=self.api.format(next_page), callback=self.parse)
             
     def parse_author(self, response):
-        yield {
-            'author_name': response.css('.font-tighten-most::text').getall(),
-            'author_bio': response.css('p.mbn.description-text.space-for-headshot::text').getall(),
-        }
+        article_item = response.meta['article_item']
+        loader = ItemLoader(item=article_item, response=response)
+        loader.add_css(field_name='author_name', css='.font-tighten-most::text')
+        loader.add_css(field_name='author_bio', css='p.mbn.description-text.space-for-headshot::text')
+        yield loader.load_item()

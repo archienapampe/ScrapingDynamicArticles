@@ -5,10 +5,34 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/items.html
 
-import scrapy
+from datetime import datetime
+
+from scrapy import Item, Field
+from scrapy.loader.processors import MapCompose, TakeFirst
 
 
-class ScrapingProjectItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+def convert_date(text):
+    return datetime.strptime(text, '%B %d, %Y')
+
+
+class ArticleItem(Item):
+    title = Field(
+        input_processor=MapCompose(str.strip),
+        output_processor=TakeFirst()
+    )
+    category = Field(
+        input_processor=MapCompose(str.strip),
+        output_processor=TakeFirst()
+    )
+    published = Field(
+        input_processor=MapCompose(convert_date),
+        output_processor=TakeFirst()
+    )
+    author_name = Field(
+        input_processor=MapCompose(str.strip),
+        output_processor=TakeFirst()
+    )
+    author_bio = Field(
+        input_processor=MapCompose(str.strip),
+        output_processor=TakeFirst()
+    )
