@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Column, Table, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import (
-    Integer, String, DateTime, Text)
+    Integer, String, Text, Date)
 from scrapy.utils.project import get_project_settings
 
 Base = declarative_base()
@@ -27,9 +27,9 @@ class Article(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column('title', Text())
-    published = Column('published', DateTime)
-    category_id = Column(Integer, ForeignKey('category.id'))  # Many articles to one category
-    authors = relationship('Author', secondary='author_article', lazy='dynamic', backref="article") # M-to-M for article and author
+    published = Column('published', Date)
+    category_id = Column(Integer, ForeignKey('category.id'))
+    authors = relationship('Author', secondary='author_article', lazy='dynamic', backref="article") 
           
 
 class Author(Base):
@@ -37,7 +37,7 @@ class Author(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column('name', String(50), unique=True)
-    articles = relationship('Article', secondary='author_article', lazy='dynamic', backref="author") # M-to-M for article and author
+    articles = relationship('Article', secondary='author_article', lazy='dynamic', backref="author") 
           
    
 class Category(Base):
@@ -45,4 +45,4 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column('name', String(30), unique=True)
-    articles = relationship('Article', backref='category')  # One category to many articles
+    articles = relationship('Article', backref='category')  

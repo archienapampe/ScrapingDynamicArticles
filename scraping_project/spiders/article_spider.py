@@ -24,7 +24,6 @@ class ArticleSpider(scrapy.Spider):
             loader.add_value(field_name='published', value=article.get('published'))
             article_item = loader.load_item()
             
-            self.logger.info('get article url')
             article_url = article['link']['href']
             yield scrapy.Request(url=self.start_page.format(article_url),
                                   callback=self.parse_author, meta={'article_item': article_item})

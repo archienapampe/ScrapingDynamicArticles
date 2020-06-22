@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Define here the models for your scraped items
-#
-# See documentation in:
-# https://docs.scrapy.org/en/latest/topics/items.html
-
 from datetime import datetime
 
 from scrapy import Item, Field
@@ -13,7 +6,7 @@ from scrapy.loader.processors import MapCompose, TakeFirst
 
 def convert_date(text):
     return datetime.strptime(text, '%B %d, %Y')
-
+    
 
 class ArticleItem(Item):
     title = Field(
