@@ -14,7 +14,7 @@ BOT_NAME = 'scraping_project'
 SPIDER_MODULES = ['scraping_project.spiders']
 NEWSPIDER_MODULE = 'scraping_project.spiders'
 
-
+CONNECTION_STRING = 'sqlite:///scrapy_article.db'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'scraping_project (+http://www.yourdomain.com)'
 
@@ -64,9 +64,10 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'scraping_project.pipelines.ScrapingProjectPipeline': 300,
-#}
+ITEM_PIPELINES = {
+    'scraping_project.pipelines.DuplicatesPipeline': 100,
+    'scraping_project.pipelines.SaveArticlePipeline': 200,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

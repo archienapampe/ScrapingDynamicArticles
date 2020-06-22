@@ -7,6 +7,7 @@ from scraping_project.items import ArticleItem
 
 
 class ArticleSpider(scrapy.Spider):
+    # parsing site page - https://hbr.org/insight-center/coronavirus
     name = 'article'
     api = 'https://hbr.org/service/components/list/the-latest/{}/8?format=json&id=page.list.coronavirus.insight-center'
     start_page = 'https://hbr.org{}'
@@ -25,7 +26,8 @@ class ArticleSpider(scrapy.Spider):
             
             self.logger.info('get article url')
             article_url = article['link']['href']
-            yield scrapy.Request(url=self.start_page.format(article_url), callback=self.parse_author, meta={'article_item': article_item})
+            yield scrapy.Request(url=self.start_page.format(article_url),
+                                  callback=self.parse_author, meta={'article_item': article_item})
             
         if data['page']['hasNext']:
             next_page = data['page']['number'] + 1
@@ -35,5 +37,4 @@ class ArticleSpider(scrapy.Spider):
         article_item = response.meta['article_item']
         loader = ItemLoader(item=article_item, response=response)
         loader.add_css(field_name='author_name', css='.font-tighten-most::text')
-        loader.add_css(field_name='author_bio', css='p.mbn.description-text.space-for-headshot::text')
         yield loader.load_item()

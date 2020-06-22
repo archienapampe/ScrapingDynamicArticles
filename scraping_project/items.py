@@ -28,11 +28,4 @@ class ArticleItem(Item):
         input_processor=MapCompose(convert_date),
         output_processor=TakeFirst()
     )
-    author_name = Field(
-        input_processor=MapCompose(str.strip),
-        output_processor=TakeFirst()
-    )
-    author_bio = Field(
-        input_processor=MapCompose(str.strip),
-        output_processor=TakeFirst()
-    )
+    author_name = Field(input_processor=MapCompose(str.strip))
