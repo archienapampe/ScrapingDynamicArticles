@@ -1,5 +1,3 @@
-import json
-
 import scrapy
 from scrapy.loader import ItemLoader
 
@@ -16,7 +14,7 @@ class ArticleSpider(scrapy.Spider):
     
     def parse(self, response):
         self.logger.info('start scraping articles')
-        data = json.loads(response.text)
+        data = response.json()
         for article in data.get('entry', []):
             loader = ItemLoader(item=ArticleItem(), selector=article)
             loader.add_value(field_name='title', value=article.get('title'))
